@@ -3,6 +3,7 @@
 
 void parse_gps_data(char arr[]);
 static bool checksum(char array[]);
+static void check(char arry[],int abs_ary[16]);
 
 void parse_gps_data(char arr[])
 {
@@ -53,4 +54,50 @@ static bool checksum(char array[])
 	sscanf(&array[x], "%2X", &receivedChecksum);        //Reading and storing the checksum from NMEA in HEX Format
 
 	return receivedChecksum==chcksum;                   //Compare the two and return the boolean
+}
+
+static void check(char arry[],int abs_ary[16])
+{
+    /*This function checks empty parameters in the input string and sets their size 
+    to 0 while also storing the sizes of other parameters in the abs_array variable*/
+    size_t sze =  strlen(arry);
+
+    //absent is a check to see how many commas(parameters) have passed
+    //previous saves last location of comma to calculate size
+    int i = abs_ary[0],absent=0,prev=0;
+    bool asterik = false;
+
+    while (arry[i] != '\0') {
+        // keep iterating until comma comes
+        while (arry[i] != ',' && arry[i] != '*' && i < sze) {
+            ++i;
+        }
+        if (arry[i] == '*') {
+            asterik = true;         //Boolean variable to check the arrival of asterik(checksum parameter)
+        }
+        
+        if (arry[i]==',' || arry[i]=='*') {
+            // checks if comma is present and identify if some parameter is absent
+            abs_ary[absent] = i-prev;
+            prev = i+1;
+            ++absent;
+        }
+        if (arry[i+1] == '\0') {
+            //check if the next character is the newline character signifying end of string
+            if (asterik) {
+                //if asterik has passed(checksum has passed) save the size of the string
+                abs_ary[absent] = i-prev;
+                prev = i+1;
+            }
+            else {
+                //If asterik hasn't passed means a few parameters are missing in between
+                while (absent <= 15) {
+                    //Set size of all those parameters and checksum equal to zero
+                    abs_ary[absent] = 0;
+                    ++absent;
+                }
+            }
+        }
+        ++i;
+    }
 }
