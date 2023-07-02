@@ -6,6 +6,7 @@
 #include "parse_gps_data.h"
 
 void parse_gps_data(char arr[]);
+static bool gga_check(char ary[]);
 static bool checksum(char array[]);
 static void check(char arry[],int abs_ary[16]);
 static void set_display_data(gps_t* data,int abs_ary[16],char arry[],char* param[]);
