@@ -5,6 +5,7 @@ void parse_gps_data(char arr[]);
 static bool checksum(char array[]);
 static void check(char arry[],int abs_ary[16]);
 static void set_display_data(gps_t* data,int abs_ary[16],char arry[],char* param[]);
+static void free_data(gps_t* data, int array[16]);
 
 void parse_gps_data(char arr[])
 {
@@ -277,4 +278,114 @@ static void set_display_data(gps_t* data,int abs_ary[16],char arry[],char* param
         }
     }
     free_data(data,abs_ary);                   //Free all dynamically allocated memory and point it to NULL
+}
+
+static void free_data(gps_t* data,int array[16])
+{
+    /*This function frees data that was dynamically allocated previously using strdup() to avoid memory
+    leak and also points those pointers to NULL to avoid dangling and wild pointers*/
+    int i = 0;
+    while (i<16) {
+        switch (i) {
+            case 0:
+                if (array[0] != 0) {           //Free only if size is not zero since we used strdup only for non-zero size
+                    free(data->sat_type);    //Free memory location
+                    data->sat_type = NULL;   //Point the pointer to NULL to avoid dangling pointer
+                }
+                break;  
+            case 1:
+                if (array[i] != 0) {
+                	free(data->timestamp);
+                    data->timestamp = NULL;
+                }
+               break;
+            case 2:
+                if (array[i] != 0) {
+                	free(data->latitude);
+                    data->latitude = NULL;
+                }
+                break;
+            case 3:
+                if (array[i] != 0) {
+                	free(data->lat_dir);
+                    data->lat_dir = NULL;
+                }
+                break;
+            case 4:
+                if (array[i] != 0) {
+                	free(data->longitude);
+                    data->longitude = NULL;
+                }
+                break;
+            case 5:
+                if (array[i] != 0) {
+                	free(data->long_dir);
+                    data->long_dir = NULL;
+                }
+                break;
+            case 6:
+                if (array[i] != 0) {
+                	free(data->precision);
+                    data->precision = NULL;
+                    }
+                break;
+            case 7:
+                if (array[i] != 0) {
+               	free(data->sat_no);
+                    data->sat_no = NULL;
+                }
+                break;
+            case 8:
+                if (array[i] != 0) {
+                	free(data->hdp);
+                    data->hdp = NULL;
+                }
+                break;
+            case 9:
+                if (array[i] != 0) {
+                	free(data->alt);
+                    data->alt = NULL;
+                }
+            break;
+            case 10:
+                if (array[i] != 0) {
+                	free(data->unit1);
+                    data->unit1 = NULL;
+                }
+                break;
+            case 11:
+                if (array[i] != 0) {
+                	free(data->geo_sep);
+                    data->geo_sep = NULL;
+                }
+                break;
+            case 12:
+                if (array[i] != 0) {
+                	free(data->unit2);
+                    data->unit2 = NULL;
+                }
+                break;
+            case 13:
+                if (array[i] != 0) {
+                	free(data->aoc);
+                    data->aoc = NULL;
+                }
+                break;
+            case 14:
+                if (array[i] != 0) {
+                	free(data->cor_stat_id);
+                    data->cor_stat_id = NULL;
+                }
+                break;
+            case 15:
+                if (array[i] != 0) {
+                	free(data->checksum);
+                    data->checksum = NULL;
+                }
+                break;
+            default:
+                break;
+        }
+        ++i;
+    }   
 }
