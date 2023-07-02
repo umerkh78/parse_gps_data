@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include "D:\ESP32\esp-idf\components\log\include\esp_log.h"
 #include "parse_gps_data.h"
 
 void parse_gps_data(char arr[]);
@@ -9,9 +13,31 @@ static void free_data(gps_t* data, int array[16]);
 
 void parse_gps_data(char arr[])
 {
+    /*This function will take NMEA format data in the form of 
+    character array and output it's individual parameters while
+    checking if string is correct and validating the checksum as 
+    well.*/
+    static char *param[] = {"Satellite Type","Time Stamp","Latitude","Latitude Direction",   //Array of NMEA parameters
+    "Longitude","Longitude Direction","Precision","No. of Satellites",
+    "Horizontal Dilution of Precision","Altitude of the GPS Antenna","Altitude Unit",
+    "Geoidal Separation","Geoidal Separation Unit","Age of the Correction",
+    "Correction Station ID","Checksum"};
+    static int abs_ary[16] = {};                                           //This saves sizes of each member in array
 
+    if (gga_check(arr)) {                     //gga_check verifies the correctness of the string
+        check(arr,abs_ary);           //If string correct then check sizes of each parameter
+
+        if (!checksum(arr)) {                 //This checks the checksum of data to validate packet integrity
+    	    ESP_LOGI("ERROR","Checksum Not Verified. Data Lost during transmission");
+        }
+        
+        gps_t data;                           //Creating a variable of type GPS(which is a struct)
+        set_display_data(&data,abs_ary,arr,param);          //Saving and displaying data from struct
+    }
+    else {
+        ESP_LOGI("ERROR","Incorrect Input Please Enter a valid GGA string");
+    }
 }
-
 
 static bool gga_check(char ary[])
 {
