@@ -45,7 +45,7 @@ static bool gga_check(char ary[])
     /*This function checks the GGA parameter to check if the right
     inout string has been entered. GGA is the first parameter of 
     NMEA format GPS data.*/
-	if (ary[0] == ',') {
+	if (ary[0] == ','|| ary[0] == '\0') {
         //Checks if the first parameter is empty
 		return false;
 	}
